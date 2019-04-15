@@ -1,0 +1,51 @@
+version: "3.5"
+networks:
+  default:
+    external:
+      name: proxy
+  intern: {}
+volumes:
+  app: {}
+  db: {}
+services:
+  mvc-php:
+    image: akilli/php
+    restart: unless-stopped
+    networks:
+      default: {}
+      intern:
+        aliases:
+          - php
+    volumes:
+      - source: app
+        target: /app
+        type: volume
+    environment:
+      - http_proxy
+      - https_proxy
+      - ftp_proxy
+      - no_proxy
+  mvc-app:
+    image: akilli/nginx
+    #image: registry.sti.bayern.de/virtual
+    restart: unless-stopped
+    labels:
+      traefik.enable: "true"
+      traefik.port: "80"
+      traefik.docker.network: "proxy"
+      traefik.frontend.rule: "HostRegexp: mvc.{domain:.+}"
+    networks:
+      default: {}
+      intern:
+        aliases:
+          - app
+    depends_on:
+      - mvc-php
+    environment:
+      - http_proxy
+      - https_proxy
+      - ftp_proxy
+    volumes:
+      - source: app
+        target: /app
+        type: volume

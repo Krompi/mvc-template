@@ -1,0 +1,12 @@
+version: "3.5"
+services:
+  mvc-app:
+    volumes:
+      - source: ./
+        target: /app
+        type: bind
+  mvc-php:
+    volumes:
+      - source: ./
+        target: /app
+        type: bind
